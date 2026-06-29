@@ -59,8 +59,12 @@ one-time finale.
 ## Features
 
 - **Logging** — pick a Path (editable; defaults Research / German / Math /
-  Physics), enter minutes or hours + an optional note. Sessions are listed
+  Physics), enter minutes or hours + an optional note, and optionally backdate
+  the session (fix a misclick or backfill past days). Sessions are listed
   newest-first and individually deletable (deleting recomputes everything).
+- **Breakthrough sound** — a soft synthesized pentatonic chime on breakthrough
+  (Web Audio, no assets) that grows richer for major realms & ascension, with a
+  mute toggle that persists.
 - **Dashboard** — big current-realm display with a flowing-qi progress bar
   (glow intensifies as the realm climbs), total hours, sessions, current &
   longest streak, and a per-path breakdown.

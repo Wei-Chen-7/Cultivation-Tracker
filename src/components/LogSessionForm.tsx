@@ -19,6 +19,20 @@ type Unit = 'min' | 'hr';
 
 const PRESETS_MIN = [25, 45, 60, 90];
 
+/** Format a Date as a `datetime-local` input value in local time. */
+function toLocalInput(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+    d.getHours(),
+  )}:${pad(d.getMinutes())}`;
+}
+
+function yesterdayLocal(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return toLocalInput(d);
+}
+
 export default function LogSessionForm({
   paths,
   onLog,
@@ -29,6 +43,7 @@ export default function LogSessionForm({
   const [amount, setAmount] = useState('');
   const [unit, setUnit] = useState<Unit>('min');
   const [note, setNote] = useState('');
+  const [when, setWhen] = useState(''); // '' = log for now
   const [editingPaths, setEditingPaths] = useState(false);
   const [newPath, setNewPath] = useState('');
   const [error, setError] = useState('');
@@ -47,12 +62,21 @@ export default function LogSessionForm({
       setError('Enter a duration greater than zero.');
       return;
     }
+    let timestamp = Date.now();
+    if (when) {
+      const parsed = new Date(when).getTime();
+      if (!Number.isFinite(parsed)) {
+        setError('That date/time is invalid.');
+        return;
+      }
+      timestamp = parsed;
+    }
     const minutes = unit === 'hr' ? value * 60 : value;
     onLog({
       path: activePath,
       minutes,
       note: note.trim() || undefined,
-      timestamp: Date.now(),
+      timestamp,
     });
     setAmount('');
     setNote('');
@@ -195,8 +219,50 @@ export default function LogSessionForm({
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Note (optional) — what did you work on?"
-        className="mb-4 w-full rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm outline-none placeholder:text-slate-500 focus:border-jade-500"
+        className="mb-3 w-full rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm outline-none placeholder:text-slate-500 focus:border-jade-500"
       />
+
+      {/* When — defaults to now; can backdate to fix or backfill */}
+      <div className="mb-4">
+        {when ? (
+          <div className="flex items-center gap-2">
+            <input
+              type="datetime-local"
+              value={when}
+              max={toLocalInput(new Date())}
+              onChange={(e) => setWhen(e.target.value)}
+              className="flex-1 rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-slate-200 outline-none focus:border-jade-500 [color-scheme:dark]"
+            />
+            <button
+              type="button"
+              onClick={() => setWhen('')}
+              className="rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-400 transition hover:border-jade-500 hover:text-jade-300"
+            >
+              now
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+            <span>
+              Logging for <span className="text-slate-300">now</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setWhen(yesterdayLocal())}
+              className="rounded-md border border-white/10 px-2 py-1 transition hover:border-jade-500 hover:text-jade-300"
+            >
+              yesterday
+            </button>
+            <button
+              type="button"
+              onClick={() => setWhen(toLocalInput(new Date()))}
+              className="rounded-md border border-white/10 px-2 py-1 transition hover:border-jade-500 hover:text-jade-300"
+            >
+              pick a time…
+            </button>
+          </div>
+        )}
+      </div>
 
       {error && <p className="mb-3 text-sm text-red-400">{error}</p>}
 

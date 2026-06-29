@@ -16,6 +16,7 @@ import {
 import type { CultivationStatus } from './cultivation/realms';
 import { breakthroughText } from './cultivation/breakthroughText';
 import { realmTheme } from './cultivation/realmTheme';
+import { playBreakthrough } from './utils/sound';
 import {
   computeAchievements,
   computeStreaks,
@@ -89,6 +90,8 @@ export default function App() {
   function celebrate(before: CultivationStatus, after: CultivationStatus) {
     const event = detectBreakthrough(before, after);
     if (event.kind === 'none') return;
+
+    playBreakthrough(event.kind, state.muted);
 
     const theme = realmTheme(after.realm.index);
     const text = breakthroughText(event.kind, after);
@@ -198,6 +201,10 @@ export default function App() {
     });
   }
 
+  function toggleMute() {
+    setState((s) => ({ ...s, muted: !s.muted }));
+  }
+
   function reset() {
     clearState();
     setState(defaultState());
@@ -254,11 +261,26 @@ export default function App() {
               through, ascend.
             </p>
           </div>
-          <DataControls
-            onExport={handleExport}
-            onImport={handleImport}
-            onReset={reset}
-          />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleMute}
+              aria-label={
+                state.muted
+                  ? 'Unmute breakthrough sounds'
+                  : 'Mute breakthrough sounds'
+              }
+              title={state.muted ? 'Sound off' : 'Sound on'}
+              className="rounded-lg border border-white/10 px-2.5 py-1.5 text-sm text-slate-300 transition hover:border-jade-500 hover:text-jade-300"
+            >
+              {state.muted ? '🔇' : '🔊'}
+            </button>
+            <DataControls
+              onExport={handleExport}
+              onImport={handleImport}
+              onReset={reset}
+            />
+          </div>
         </header>
 
         {/* Body */}

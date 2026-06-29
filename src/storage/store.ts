@@ -19,6 +19,7 @@ export function defaultState(): AppState {
     paths: [...DEFAULT_PATHS],
     spentStones: 0,
     rewards: [],
+    muted: false,
   };
 }
 
@@ -103,6 +104,7 @@ export function sanitizeState(raw: unknown): AppState {
     paths: paths.length > 0 ? paths : [...DEFAULT_PATHS],
     spentStones,
     rewards,
+    muted: raw.muted === true,
   };
 }
 

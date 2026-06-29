@@ -34,4 +34,6 @@ export interface AppState {
   spentStones: number;
   /** user-defined reward catalog */
   rewards: Reward[];
+  /** mute breakthrough sound effects */
+  muted: boolean;
 }

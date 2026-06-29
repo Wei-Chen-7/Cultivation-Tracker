@@ -180,6 +180,9 @@ export interface AchievementInputs {
 /** Compute the achievement list with current unlocked state (derived). */
 export function computeAchievements(input: AchievementInputs): Achievement[] {
   const { sessions, hours, streak, majorRealmIndex, ascended } = input;
+  const distinctPaths = new Set(sessions.map((s) => s.path)).size;
+  const hasSeclusion = sessions.some((s) => (s.note ?? '').includes('闭关'));
+
   return [
     {
       id: 'first-session',
@@ -196,18 +199,25 @@ export function computeAchievements(input: AchievementInputs): Achievement[] {
       unlocked: sessions.length >= 10,
     },
     {
+      id: 'seclusion',
+      title: 'Deep Seclusion',
+      chinese: '闭关苦修',
+      description: 'Complete a 闭关 seclusion timer session.',
+      unlocked: hasSeclusion,
+    },
+    {
+      id: 'all-paths',
+      title: 'Many Paths, One Dao',
+      chinese: '诸法皆修',
+      description: 'Log time on four or more different paths.',
+      unlocked: distinctPaths >= 4,
+    },
+    {
       id: 'hundred-hours',
       title: 'A Hundred Hours of Qi',
       chinese: '百时炼气',
       description: 'Accumulate 100 cultivation hours.',
       unlocked: hours >= 100,
-    },
-    {
-      id: 'streak-7',
-      title: 'Seven Days Unbroken',
-      chinese: '七日不辍',
-      description: 'Reach a 7-day cultivation streak.',
-      unlocked: streak.longest >= 7,
     },
     {
       id: 'first-major',
@@ -217,11 +227,46 @@ export function computeAchievements(input: AchievementInputs): Achievement[] {
       unlocked: majorRealmIndex >= 1,
     },
     {
+      id: 'streak-7',
+      title: 'Seven Days Unbroken',
+      chinese: '七日不辍',
+      description: 'Reach a 7-day cultivation streak.',
+      unlocked: streak.longest >= 7,
+    },
+    {
       id: 'core-formed',
       title: 'Golden Core',
       chinese: '金丹凝成',
       description: 'Reach 结丹 (Core Formation).',
       unlocked: majorRealmIndex >= 2,
+    },
+    {
+      id: 'nascent-soul',
+      title: 'Nascent Soul Emerges',
+      chinese: '元婴出窍',
+      description: 'Reach 元婴 (Nascent Soul).',
+      unlocked: majorRealmIndex >= 3,
+    },
+    {
+      id: 'five-hundred-hours',
+      title: 'Five Hundred Hours',
+      chinese: '五百载功',
+      description: 'Accumulate 500 cultivation hours.',
+      unlocked: hours >= 500,
+    },
+    {
+      id: 'streak-30',
+      title: 'A Month Unbroken',
+      chinese: '月不间断',
+      description: 'Reach a 30-day cultivation streak.',
+      unlocked: streak.longest >= 30,
+    },
+    {
+      id: 'thousand-hours',
+      title: 'A Thousand Hours Tempered',
+      chinese: '千锤百炼',
+      description: 'Accumulate 1000 cultivation hours.',
+      unlocked: hours >= 1000,
     },
     {
       id: 'ascended',
