@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { pathColor } from '../cultivation/realmTheme';
+import { toDatetimeLocal } from '../utils/format';
 
 export interface LogInput {
   path: string;
@@ -19,18 +20,10 @@ type Unit = 'min' | 'hr';
 
 const PRESETS_MIN = [25, 45, 60, 90];
 
-/** Format a Date as a `datetime-local` input value in local time. */
-function toLocalInput(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`;
-}
-
 function yesterdayLocal(): string {
   const d = new Date();
   d.setDate(d.getDate() - 1);
-  return toLocalInput(d);
+  return toDatetimeLocal(d);
 }
 
 export default function LogSessionForm({
@@ -229,7 +222,7 @@ export default function LogSessionForm({
             <input
               type="datetime-local"
               value={when}
-              max={toLocalInput(new Date())}
+              max={toDatetimeLocal(new Date())}
               onChange={(e) => setWhen(e.target.value)}
               className="flex-1 rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-slate-200 outline-none focus:border-jade-500 [color-scheme:dark]"
             />
@@ -255,7 +248,7 @@ export default function LogSessionForm({
             </button>
             <button
               type="button"
-              onClick={() => setWhen(toLocalInput(new Date()))}
+              onClick={() => setWhen(toDatetimeLocal(new Date()))}
               className="rounded-md border border-white/10 px-2 py-1 transition hover:border-jade-500 hover:text-jade-300"
             >
               pick a time…

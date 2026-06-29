@@ -33,6 +33,14 @@ export function formatRelative(timestampMs: number, now = Date.now()): string {
   });
 }
 
+/** Format a Date as a `datetime-local` input value (local time). */
+export function toDatetimeLocal(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+    d.getHours(),
+  )}:${pad(d.getMinutes())}`;
+}
+
 /** "Jun 28, 3:40 PM" for tooltips / detail. */
 export function formatDateTime(timestampMs: number): string {
   return new Date(timestampMs).toLocaleString(undefined, {

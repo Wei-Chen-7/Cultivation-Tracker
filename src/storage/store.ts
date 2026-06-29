@@ -20,8 +20,11 @@ export function defaultState(): AppState {
     spentStones: 0,
     rewards: [],
     muted: false,
+    dailyGoalMinutes: 120,
   };
 }
+
+const DEFAULT_DAILY_GOAL = 120;
 
 // ── Validation helpers ──────────────────────────────────────────────────────
 // We hand-validate rather than trust the shape, because localStorage data may
@@ -105,6 +108,12 @@ export function sanitizeState(raw: unknown): AppState {
     spentStones,
     rewards,
     muted: raw.muted === true,
+    dailyGoalMinutes:
+      typeof raw.dailyGoalMinutes === 'number' &&
+      Number.isFinite(raw.dailyGoalMinutes) &&
+      raw.dailyGoalMinutes > 0
+        ? Math.round(raw.dailyGoalMinutes)
+        : DEFAULT_DAILY_GOAL,
   };
 }
 

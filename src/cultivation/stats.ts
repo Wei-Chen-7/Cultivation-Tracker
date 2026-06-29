@@ -148,6 +148,48 @@ export function dailyHours(
   return points;
 }
 
+// ── Today & weekly rhythm ────────────────────────────────────────────────────
+
+/** Total minutes logged on the current local calendar day. */
+export function todayMinutes(
+  sessions: Session[],
+  now: number = Date.now(),
+): number {
+  const today = dayIndex(now);
+  return sessions.reduce(
+    (sum, s) => (dayIndex(s.timestamp) === today ? sum + s.minutes : sum),
+    0,
+  );
+}
+
+export interface WeeklySummary {
+  /** hours in the last 7 calendar days (today and the 6 before it) */
+  thisWeek: number;
+  /** hours in the 7 days before that */
+  lastWeek: number;
+  /** thisWeek − lastWeek, in hours */
+  delta: number;
+}
+
+/** Compare cultivation hours this week vs the previous week. */
+export function weeklySummary(
+  sessions: Session[],
+  now: number = Date.now(),
+): WeeklySummary {
+  const today = dayIndex(now);
+  let thisWeekMin = 0;
+  let lastWeekMin = 0;
+  for (const s of sessions) {
+    const d = dayIndex(s.timestamp);
+    const ago = today - d;
+    if (ago >= 0 && ago <= 6) thisWeekMin += s.minutes;
+    else if (ago >= 7 && ago <= 13) lastWeekMin += s.minutes;
+  }
+  const thisWeek = minutesToHours(thisWeekMin);
+  const lastWeek = minutesToHours(lastWeekMin);
+  return { thisWeek, lastWeek, delta: thisWeek - lastWeek };
+}
+
 // ── Spirit stones (灵石) ─────────────────────────────────────────────────────
 
 /** One spirit stone earned per whole cultivation hour. */

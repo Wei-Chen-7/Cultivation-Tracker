@@ -36,4 +36,6 @@ export interface AppState {
   rewards: Reward[];
   /** mute breakthrough sound effects */
   muted: boolean;
+  /** daily cultivation goal in minutes (for the "today" ring) */
+  dailyGoalMinutes: number;
 }

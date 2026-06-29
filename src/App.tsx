@@ -24,13 +24,17 @@ import {
   pathBreakdown,
   stoneBalance,
   stonesEarned,
+  todayMinutes,
   totalHours as sumHours,
+  weeklySummary,
 } from './cultivation/stats';
 import type { Achievement } from './cultivation/stats';
 import Dashboard from './components/Dashboard';
+import DailyGoal from './components/DailyGoal';
 import LogSessionForm from './components/LogSessionForm';
 import type { LogInput } from './components/LogSessionForm';
 import SessionList from './components/SessionList';
+import type { SessionPatch } from './components/SessionList';
 import MeditationTimer from './components/MeditationTimer';
 import DailyChart from './components/DailyChart';
 import Achievements from './components/Achievements';
@@ -75,6 +79,8 @@ export default function App() {
     [state.sessions, state.paths],
   );
   const daily = useMemo(() => dailyHours(state.sessions, 21), [state.sessions]);
+  const todayMin = useMemo(() => todayMinutes(state.sessions), [state.sessions]);
+  const weekly = useMemo(() => weeklySummary(state.sessions), [state.sessions]);
   const achievements = useMemo(
     () => achievementsFor(state.sessions),
     [state.sessions],
@@ -160,6 +166,19 @@ export default function App() {
       ...s,
       sessions: s.sessions.filter((x) => x.id !== id),
     }));
+  }
+
+  // Editing is a correction, not a fresh achievement — recompute silently,
+  // no breakthrough/achievement toasts.
+  function editSession(id: string, patch: SessionPatch) {
+    setState((s) => ({
+      ...s,
+      sessions: s.sessions.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+    }));
+  }
+
+  function setDailyGoal(min: number) {
+    setState((s) => ({ ...s, dailyGoalMinutes: Math.max(15, Math.round(min)) }));
   }
 
   function addPath(name: string) {
@@ -298,10 +317,17 @@ export default function App() {
               sessions={state.sessions}
               paths={state.paths}
               onDelete={deleteSession}
+              onEdit={editSession}
             />
           </div>
 
           <div className="space-y-5">
+            <DailyGoal
+              todayMin={todayMin}
+              goalMin={state.dailyGoalMinutes}
+              onSetGoal={setDailyGoal}
+              weekly={weekly}
+            />
             <LogSessionForm
               paths={state.paths}
               onLog={addSession}
